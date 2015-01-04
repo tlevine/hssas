@@ -23,29 +23,38 @@ name = do a <- nameHead
     nameTail = P.many $ nameHead P.<|> P.digit
 
 literal :: P.Parser Word
-literal = do quoteChar <- P.oneOf "\"'"
-             body <- P.many $ character quoteChar
-             _ <- P.char quoteChar
-             return $ Literal body
+literal = do x <- literal'
+             return $ Literal x
+
+literal' :: P.Parser String
+literal' = do quoteChar <- P.oneOf "\"'"
+              body <- P.many $ character quoteChar
+              _ <- P.char quoteChar
+              return body
   where
     character quoteChar = (P.noneOf [quoteChar]) P.<|>
                           (P.try (P.string [quoteChar, quoteChar] >> return quoteChar))
 
-integer :: P.Parser String
-integer = do valence <- P.option '+' $ P.char '-'
-             magnitude <- P.many P.digit
-             return $ valence:magnitude
+integerNumber :: P.Parser String
+integerNumber = do valence <- P.option '+' $ P.char '-'
+                   magnitude <- P.many P.digit
+                   return $ valence:magnitude
 
-decimal :: P.Parser String
-decimal = do left <- integer
-             middle <- P.char '.'
-             right <- P.many P.digit
-             return $ left ++ ( middle : right )
+decimalNumber :: P.Parser String
+decimalNumber = do left <- integerNumber
+                   middle <- P.char '.'
+                   right <- P.many P.digit
+                   return $ left ++ ( middle : right )
 
-scientific :: P.Parser String
-scientific = do left <- decimal
-                middle <- P.char 'e'
-                right <- integer
-                return $ left ++ ( middle : right )
+scientificNumber :: P.Parser String
+scientificNumber = do left <- decimalNumber
+                      middle <- P.char 'e'
+                      right <- integerNumber
+                      return $ left ++ ( middle : right )
+
+dateNumber :: P.Parser String
+dateNumber = do left <- literal'
+                right <- P.char 'd'
+                return $ left ++ [right]
 
 p t = P.parse t "(unspecified source)"
