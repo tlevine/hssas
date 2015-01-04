@@ -22,16 +22,16 @@ name = do a <- nameHead
     nameHead = P.letter P.<|> (P.char '_')
     nameTail = P.many $ nameHead P.<|> P.digit
 
--- literal :: P.Parser Word
+literal :: P.Parser Word
 literal = do quoteChar <- P.oneOf "\"'"
              body <- P.many $
                               normalString quoteChar  P.<|> 
                                 escaped quoteChar
              P.char quoteChar
-             return $ body
+             return $ Literal $ concat body
   where
-    escaped quoteChar = do x <- P.string _ -- [quoteChar, quoteChar]
-                           return quoteChar
+    escaped quoteChar = do x <- P.string [quoteChar, quoteChar]
+                           return [quoteChar]
     normalString quoteChar = do x <- P.many $ P.noneOf [quoteChar]
                                 return $ x
 
