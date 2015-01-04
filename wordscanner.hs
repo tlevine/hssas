@@ -24,15 +24,15 @@ name = do a <- nameHead
 
 literal :: P.Parser Word
 literal = do quoteChar <- P.oneOf "\"'"
-             body <- P.many $
-                              normalString quoteChar  P.<|> 
-                                escaped quoteChar
-             P.char quoteChar
-             return $ Literal $ concat body
+             body <- P.manyTill (bodyInit quoteChar) (bodyLast quoteChar)
+             _ <- bodyLast quoteChar
+             return $ Literal $ init body
   where
     escaped quoteChar = do x <- P.string [quoteChar, quoteChar]
-                           return [quoteChar]
-    normalString quoteChar = do x <- P.many $ P.noneOf [quoteChar]
-                                return $ x
+                           return quoteChar
+    bodyInit quoteChar = P.noneOf [quoteChar] P.<|> escaped quoteChar
+    bodyLast quoteChar = do P.char quoteChar
+                            P.notFollowedBy (P.char quoteChar)
+                            return quoteChar
 
 p t = P.parse t "(unspecified source)"
