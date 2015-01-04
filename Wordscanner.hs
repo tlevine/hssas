@@ -1,7 +1,9 @@
 module Wordscanner where
 
 import qualified Text.ParserCombinators.Parsec as P
-import           WordscannerHelpers (literal', dateNumber, scientificNumber)
+import           WordscannerHelpers           (literal',
+                                               dateNumber, scientificNumber,
+                                               specialCharacterChoices)
 
 data Word = Name String |
             Literal String |
@@ -30,5 +32,9 @@ literal = do x <- literal'
 number :: P.Parser Word
 number = do x <- dateNumber P.<|> scientificNumber
             return $ Number x
+
+specialCharacter :: P.Parser Word
+specialCharacter = do x <- P.choice specialCharacterChoices
+                      return $ SpecialCharacter x
 
 p t = P.parse t "(unspecified source)"

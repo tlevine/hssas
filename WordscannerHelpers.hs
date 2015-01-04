@@ -39,3 +39,13 @@ dateNumber :: P.Parser String
 dateNumber = do left <- literal'
                 right <- P.char 'd'
                 return $ '\'':left ++ '\'':[right]
+
+specialCharacterChoices :: [P.Parser String]
+specialCharacterChoices = map P.string ["<>", "><",
+                                        "~=" , ">=", "¬=", "^=", "<=",
+                                        "||", "**",
+                                        "=", ";",
+                                        "&", "|",
+                                        "*", "/", "-", "+",
+                                        ">", "<", "!",
+                                        "¬", "ˆ", "~", "¦"]
