@@ -21,3 +21,9 @@ name = do a <- nameHead
   where
     nameHead = P.letter P.<|> (P.char '_')
     nameTail = P.many $ nameHead P.<|> P.digit
+
+literal :: P.Parser Word
+literal = do quotechar <- P.oneOf "\"'"
+             body <- P.many $ P.noneOf "\"" P.<|> 
+             P.char quotechar
+             return $ Literal body
