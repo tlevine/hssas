@@ -35,29 +35,37 @@ literal' = do quoteChar <- P.oneOf "\"'"
     character quoteChar = (P.noneOf [quoteChar]) P.<|>
                           (P.try (P.string [quoteChar, quoteChar] >> return quoteChar))
 
+wholeNumber :: P.Parser String
+wholeNumber = P.many1 P.digit
+
 integerNumber :: P.Parser String
 integerNumber = do valence <- P.option '+' $ P.char '-'
-                   magnitude <- P.many P.digit
+                   magnitude <- wholeNumber
                    return $ valence:magnitude
 
 decimalNumber :: P.Parser String
 decimalNumber = do left <- integerNumber
-                   middle <- P.char '.'
-                   right <- P.many P.digit
+                   middle <- P.option '.' $ P.char '.'
+                   right <- P.option "" $ P.many P.digit
                    return $ left ++ ( middle : right )
 
 scientificNumber :: P.Parser String
 scientificNumber = do left <- decimalNumber
-                      middle <- P.char 'e'
-                      right <- integerNumber
-                      return $ left ++ ( middle : right )
+                      right <- P.option "e0" wholeNumber
+                      return $ left ++ right
+
+significand :: P.Parser String
+significand = do e <- P.oneOf "eE"
+                 n <- wholeNumber
+                 return n
 
 dateNumber :: P.Parser String
 dateNumber = do left <- literal'
                 right <- P.char 'd'
-                return $ left ++ [right]
+                return $ '\'':left ++ '\'':[right]
 
-number :: P.Parser String
-number = dateNumber P.<|> scientificNumber P.<|> decimalNumber P.<|> integerNumber
+number :: P.Parser Word
+number = do x <- dateNumber P.<|> scientificNumber
+            return $ Number x
 
 p t = P.parse t "(unspecified source)"
