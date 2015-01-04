@@ -44,6 +44,7 @@ specialCharacterChoices :: [P.Parser String]
 specialCharacterChoices = map P.string ["<>", "><",
                                         "~=" , ">=", "¬=", "^=", "<=",
                                         "||", "**",
+                                        "/*", "*/",
                                         "=", ";",
                                         "&", "|",
                                         "*", "/", "-", "+",
