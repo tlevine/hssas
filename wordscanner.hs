@@ -24,9 +24,9 @@ name = do a <- nameHead
 
 literal :: P.Parser Word
 literal = do quoteChar <- P.oneOf "\"'"
-             body <- P.manyTill (bodyInit quoteChar) (bodyLast quoteChar)
-             _ <- bodyLast quoteChar
-             return $ Literal $ init body
+             body <- P.many $ P.noneOf [quoteChar]
+             _ <- P.char quoteChar
+             return $ Literal body
   where
     escaped quoteChar = do x <- P.string [quoteChar, quoteChar]
                            return quoteChar
