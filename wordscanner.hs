@@ -57,4 +57,7 @@ dateNumber = do left <- literal'
                 right <- P.char 'd'
                 return $ left ++ [right]
 
+number :: P.Parser String
+number = dateNumber P.<|> scientificNumber P.<|> decimalNumber P.<|> integerNumber
+
 p t = P.parse t "(unspecified source)"
