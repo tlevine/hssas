@@ -31,4 +31,16 @@ literal = do quoteChar <- P.oneOf "\"'"
     character quoteChar = (P.noneOf [quoteChar]) P.<|>
                           (P.try (P.string [quoteChar, quoteChar] >> return quoteChar))
 
+integer :: P.Parser String
+integer = do valence <- P.option '+' $ P.char '-'
+             magnitude <- P.many P.digit
+             return $ valence:magnitude
+
+{-
+decimal :: P.Parser String
+decimal = do left <- integer
+             middle <- [P.char '.']
+             right <- P.many P.digit
+             return $ left ++ middle ++ right
+-}
 p t = P.parse t "(unspecified source)"
