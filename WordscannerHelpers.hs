@@ -2,6 +2,14 @@ module WordscannerHelpers where
 
 import qualified Text.ParserCombinators.Parsec as P
 
+name' :: P.Parser String
+name' = do a <- nameHead
+           b <- nameTail
+           return $ a:b
+  where
+    nameHead = P.letter P.<|> (P.char '_')
+    nameTail = P.many $ nameHead P.<|> P.digit
+
 literal' :: P.Parser String
 literal' = do quoteChar <- P.oneOf "\"'"
               body <- P.many $ character quoteChar
