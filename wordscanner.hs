@@ -24,7 +24,8 @@ name = do a <- nameHead
 
 literal :: P.Parser Word
 literal = do quoteChar <- P.oneOf "\"'"
-             body <- P.manyTill (escapedQuotationMark quoteChar P.<|> P.noneOf [quoteChar]) endQuotationMark
+             body <- P.manyTill (escapedQuotationMark quoteChar P.<|> P.noneOf [quoteChar])
+                                (endQuotationMark quoteChar)
              return $ Literal body
   where
     escapedQuotationMark :: Char -> P.Parser Char
@@ -33,5 +34,6 @@ literal = do quoteChar <- P.oneOf "\"'"
     endQuotationMark :: Char -> P.Parser Char
     endQuotationMark quoteChar = do P.char quoteChar
                                     P.notFollowedBy $ P.char quoteChar
+                                    return quoteChar
 
 p t = P.parse t "(unspecified source)"
