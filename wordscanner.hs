@@ -42,4 +42,10 @@ decimal = do left <- integer
              right <- P.many P.digit
              return $ left ++ ( middle : right )
 
+scientific :: P.Parser String
+scientific = do left <- decimal
+                middle <- P.char 'e'
+                right <- integer
+                return $ left ++ ( middle : right )
+
 p t = P.parse t "(unspecified source)"
