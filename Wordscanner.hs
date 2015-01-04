@@ -36,8 +36,10 @@ specialCharacter = do x <- P.choice specialCharacterChoices
 word :: P.Parser Word
 word = specialCharacter P.<|> number P.<|> literal P.<|> name
 
-lexer :: P.Parser [Word]
-lexer = do x <- P.sepBy word P.spaces
-           return x
+statement :: P.Parser [Word]
+statement = do x <- P.sepBy word P.spaces
+               P.spaces
+               P.char ';'
+               return x
 
 p t = P.parse t "(unspecified source)"
